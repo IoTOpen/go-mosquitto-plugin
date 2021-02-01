@@ -75,3 +75,15 @@ func (c Client) SetUsername(name string) error {
 	}
 	return nil
 }
+
+func (c Client) SetClientID(clientID string) error {
+	x := (*C.struct_mosquitto)(unsafe.Pointer(c))
+	var res = C.int(0)
+	tmp := C.CString(clientID)
+	res = C.mosquitto_set_clientid(x, tmp)
+	C.free(unsafe.Pointer(tmp))
+	if Error(res) != MosqErrSuccess {
+		return fmt.Errorf("unable to set username: %d", int(res))
+	}
+	return nil
+}

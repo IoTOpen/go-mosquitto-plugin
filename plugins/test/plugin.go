@@ -84,6 +84,8 @@ func onMessage(msg mosquitto.EvtMessage) error {
 }
 
 func auth(data mosquitto.EvtBasicAuth) error {
+	log.Println("Auth attempt", data.Username(),"@", data.Client())
+	data.Client().SetClientID("myclient")
 	data.Client().SetUsername(data.Password())
 	return nil
 }
