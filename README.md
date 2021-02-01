@@ -3,7 +3,8 @@
 This module implements the mosquitto v2 plugin interface as a Go module.
 
 The new interface offers some interesting new features like message manipulation, and a callback whether a client
-disconnects. The interface is far from complete, but does implement some key concepts like registering for events and 
+disconnects. 
+This module is far from complete, but does implement some key concepts like registering for events and 
 forcefully disconnect clients.
 
 * KickClientByUsername
