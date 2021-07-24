@@ -120,6 +120,8 @@ func goGenericCallback(event int, p1 unsafe.Pointer, p2 uintptr) C.int {
 			args = append(args, reflect.ValueOf(EvtTick(p1)))
 		case MosqEvtDisconnect:
 			args = append(args, reflect.ValueOf(EvtDisconnect(p1)))
+		case MosqEvtConnect:
+			args = append(args, reflect.ValueOf(EvtConnect(p1)))
 		default:
 			return C.int(MosqErrUnknown)
 		}

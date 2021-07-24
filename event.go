@@ -25,6 +25,7 @@ const (
 	MosqEvtPSKKey          = Event(C.MOSQ_EVT_PSK_KEY)
 	MosqEvtTick            = Event(C.MOSQ_EVT_TICK)
 	MosqEvtDisconnect      = Event(C.MOSQ_EVT_DISCONNECT)
+	MosqEvtConnect         = Event(C.MOSQ_EVT_CONNECT)
 )
 
 func (e Event) String() string {
@@ -41,6 +42,7 @@ var eventMap = map[Event]string{
 	MosqEvtTick:            "Tick",
 	MosqEvtMessage:         "Message",
 	MosqEvtDisconnect:      "Disconnect",
+	MosqEvtConnect:         "Connect",
 	MosqEvtBasicAuth:       "BasicAuth",
 }
 
@@ -54,6 +56,7 @@ type (
 	EvtMessage      uintptr
 	EvtTick         uintptr
 	EvtDisconnect   uintptr
+	EvtConnect      uintptr
 )
 
 // Reload event
@@ -125,6 +128,17 @@ func (e EvtBasicAuth) Client() Client {
 // Disconnect event
 func (e EvtDisconnect) Client() Client {
 	x := (*C.struct_mosquitto_evt_disconnect)(unsafe.Pointer(e))
+	return Client(unsafe.Pointer(x.client))
+}
+
+func (e EvtDisconnect) Reason() int {
+	x := (*C.struct_mosquitto_evt_disconnect)(unsafe.Pointer(e))
+	return int(x.reason)
+}
+
+// Connect event
+func (e EvtConnect) Client() Client {
+	x := (*C.struct_mosquitto_evt_connect)(unsafe.Pointer(e))
 	return Client(unsafe.Pointer(x.client))
 }
 
