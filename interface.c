@@ -34,10 +34,10 @@ bool go_mosquitto_topic_matches_sub(char* topic, char* subscription) {
     return res;
 }
 
-int mosquitto_callback_register2(mosquitto_plugin_id_t* id, int event, void* cb, void* eventData, void* userdata) {
-    return mosquitto_callback_register(id, event, cb, eventData, userdata);
+int mosquitto_callback_register2(uintptr_t id, int event, void* cb, void* eventData, uintptr_t userdata) {
+    return mosquitto_callback_register((mosquitto_plugin_id_t*)id, event, cb, (void*)eventData, (void*)userdata);
 }
 
-int mosquitto_callback_unregister2(mosquitto_plugin_id_t* id, int event, void* cb, void* eventData) {
-    return mosquitto_callback_unregister(id, event, cb, eventData);
+int mosquitto_callback_unregister2(uintptr_t id, int event, uintptr_t cb, void* eventData) {
+    return mosquitto_callback_unregister((mosquitto_plugin_id_t*)id, event, (void*)cb, (void*)eventData);
 }

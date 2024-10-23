@@ -1,3 +1,3 @@
 module github.com/iotopen/go-mosquitto-plugin
 
-go 1.15
+go 1.23

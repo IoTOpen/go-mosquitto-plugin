@@ -4,44 +4,44 @@ import (
 	"fmt"
 	"github.com/iotopen/go-mosquitto-plugin"
 	"log"
+	"log/slog"
+	"time"
 )
 
-type Plugin struct {
-	id mosquitto.PluginID
-}
+type Plugin struct{}
 
 func (p *Plugin) Version(versions []int) int {
 	return mosquitto.MosqPluginVersion
 }
 
-func (p *Plugin) Init(id mosquitto.PluginID, options mosquitto.Options) error {
-	p.id = id
+func (p *Plugin) Init(options mosquitto.Options) error {
 	log.Println("hello world", options)
-	if err := mosquitto.CallbackRegister(id, mosquitto.MosqEvtBasicAuth, auth, nil); err != nil {
+	slog.Info("Hello world", "From", time.Now())
+	if err := mosquitto.CallbackRegister(mosquitto.MosqEvtBasicAuth, auth, nil); err != nil {
 		log.Println("Error:", err)
 		return mosquitto.MosqErrUnknown
 	}
-	if err := mosquitto.CallbackRegister(id, mosquitto.MosqEvtMessage, onMessage, nil); err != nil {
+	if err := mosquitto.CallbackRegister(mosquitto.MosqEvtMessage, onMessage, nil); err != nil {
 		log.Println("Error:", err)
 		return mosquitto.MosqErrUnknown
 	}
-	if err := mosquitto.CallbackRegister(id, mosquitto.MosqEvtDisconnect, onDisconnect, nil); err != nil {
+	if err := mosquitto.CallbackRegister(mosquitto.MosqEvtDisconnect, onDisconnect, nil); err != nil {
 		log.Println("Error:", err)
 		return mosquitto.MosqErrUnknown
 	}
-	if err := mosquitto.CallbackRegister(id, mosquitto.MosqEvtACLCheck, aclCheck, nil); err != nil {
+	if err := mosquitto.CallbackRegister(mosquitto.MosqEvtACLCheck, aclCheck, nil); err != nil {
 		log.Println("Error:", err)
 		return mosquitto.MosqErrUnknown
 	}
-	if err := mosquitto.CallbackRegister(id, mosquitto.MosqEvtControl, control, "$CONTROL/test1"); err != nil {
+	if err := mosquitto.CallbackRegister(mosquitto.MosqEvtControl, control, "$CONTROL/test1"); err != nil {
 		log.Println("Error:", err)
 		return mosquitto.MosqErrUnknown
 	}
-	if err := mosquitto.CallbackRegister(id, mosquitto.MosqEvtControl, control, "$CONTROL/test2"); err != nil {
+	if err := mosquitto.CallbackRegister(mosquitto.MosqEvtControl, control, "$CONTROL/test2"); err != nil {
 		log.Println("Error:", err)
 		return mosquitto.MosqErrUnknown
 	}
-	if err := mosquitto.CallbackRegister(id, mosquitto.MosqEvtTick, ticker, nil); err != nil {
+	if err := mosquitto.CallbackRegister(mosquitto.MosqEvtTick, ticker, nil); err != nil {
 		log.Println("Error:", err)
 		return mosquitto.MosqErrUnknown
 	}
@@ -50,8 +50,18 @@ func (p *Plugin) Init(id mosquitto.PluginID, options mosquitto.Options) error {
 
 func (p *Plugin) Cleanup(options mosquitto.Options) error {
 	log.Println("Cleanup!")
-	mosquitto.CallbackUnregister(p.id, mosquitto.MosqEvtBasicAuth, auth, nil)
-	mosquitto.CallbackUnregister(p.id, mosquitto.MosqEvtControl, control, "$CONTROL/test1")
+	if err := mosquitto.CallbackUnregister(mosquitto.MosqEvtBasicAuth, auth, nil); err != nil {
+		log.Println("Error:", err)
+		return mosquitto.MosqErrUnknown
+	}
+	if err := mosquitto.CallbackUnregister(mosquitto.MosqEvtControl, control, "$CONTROL/test1"); err != nil {
+		log.Println("Error:", err)
+		return mosquitto.MosqErrUnknown
+	}
+	if err := mosquitto.CallbackUnregister(mosquitto.MosqEvtControl, control, "$CONTROL/test2"); err != nil {
+		log.Println("Error:", err)
+		return mosquitto.MosqErrUnknown
+	}
 	return mosquitto.MosqErrSuccess
 }
 
@@ -60,10 +70,9 @@ func ticker(evt mosquitto.EvtTick) error {
 }
 
 func control(evt mosquitto.EvtControl) error {
-	log.Println("CONTROL:", evt)
+	log.Printf("Control: %s - %s", evt.Topic(), evt.Payload())
 	return nil
 }
-
 
 func onDisconnect(evt mosquitto.EvtDisconnect) {
 	log.Println("Plugin - Client", evt.Client().ClientID(), "Disconnected")
@@ -84,7 +93,7 @@ func onMessage(msg mosquitto.EvtMessage) error {
 }
 
 func auth(data mosquitto.EvtBasicAuth) error {
-	log.Println("Auth attempt", data.Username(),"@", data.Client())
+	log.Println("Auth attempt", data.Username(), "@", data.Client())
 	data.Client().SetClientID("myclient")
 	data.Client().SetUsername(data.Password())
 	return nil
