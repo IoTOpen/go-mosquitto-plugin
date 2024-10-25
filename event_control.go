@@ -47,3 +47,12 @@ func (e EvtControl) Retained() bool {
 	x := e.asStruct()
 	return bool(x.retain)
 }
+
+func (e EvtControl) Reason() string {
+	x := e.asStruct()
+	return C.GoString(x.reason_string)
+}
+func (e EvtControl) ReasonCode() uint8 {
+	x := e.asStruct()
+	return uint8(x.reason_code)
+}

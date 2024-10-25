@@ -76,6 +76,7 @@ func control(evt mosquitto.EvtControl) error {
 
 func onDisconnect(evt mosquitto.EvtDisconnect) {
 	log.Println("Plugin - Client", evt.Client().ClientID(), "Disconnected")
+	log.Println("Reason", evt.Reason())
 }
 
 func aclCheck(msg mosquitto.EvtAclCheck) error {
@@ -94,8 +95,16 @@ func onMessage(msg mosquitto.EvtMessage) error {
 
 func auth(data mosquitto.EvtBasicAuth) error {
 	log.Println("Auth attempt", data.Username(), "@", data.Client())
-	data.Client().SetClientID("myclient")
-	data.Client().SetUsername(data.Password())
+	crt := data.Client().X509()
+	log.Println("X509", crt.Subject)
+	err := data.Client().SetClientID("myclient")
+	if err != nil {
+		log.Println("SetClientID Error:", err)
+	}
+	err = data.Client().SetUsername(data.Password())
+	if err != nil {
+		log.Println("SetUsername Error:", err)
+	}
 	return nil
 }
 

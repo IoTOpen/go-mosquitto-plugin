@@ -23,7 +23,7 @@ var (
 	registerX = uintptr(0)
 	register  = map[uintptr]interface{}{}
 	pluginRef Plugin
-	pluginId  *C.mosquitto_plugin_id_t
+	pluginID  *C.mosquitto_plugin_id_t
 )
 
 type (
@@ -67,7 +67,7 @@ func goMosquittoPluginVersion(supportedVersionCount C.int, supportedVersions *C.
 
 //export goMosquittoPluginInit
 func goMosquittoPluginInit(identifier *C.mosquitto_plugin_id_t, options *C.struct_mosquitto_opt, optCount C.int) C.int {
-	pluginId = identifier
+	pluginID = identifier
 	x := pluginRef.Init(optMap(options, optCount))
 	if x == nil {
 		return C.int(MosqErrSuccess)
@@ -93,29 +93,29 @@ func goMosquittoPluginCleanup(options *C.struct_mosquitto_opt, optCount C.int) C
 }
 
 //export goGenericCallback
-func goGenericCallback(event int, p1 unsafe.Pointer, p2 uintptr) C.int {
-	if data, ok := register[p2]; ok {
+func goGenericCallback(event int, callbackData unsafe.Pointer, regNo uintptr) C.int {
+	if data, ok := register[regNo]; ok {
 		fn := reflect.ValueOf(data)
 		args := make([]reflect.Value, 0, 1)
 		switch Event(event) {
 		case MosqEvtReload:
-			args = append(args, reflect.ValueOf(EvtReload{p1}))
+			args = append(args, reflect.ValueOf(EvtReload{callbackData}))
 		case MosqEvtACLCheck:
-			args = append(args, reflect.ValueOf(EvtAclCheck{p1}))
+			args = append(args, reflect.ValueOf(EvtAclCheck{callbackData}))
 		case MosqEvtBasicAuth:
-			args = append(args, reflect.ValueOf(EvtBasicAuth{p1}))
+			args = append(args, reflect.ValueOf(EvtBasicAuth{callbackData}))
 		case MosqEvtPSKKey:
-			args = append(args, reflect.ValueOf(EvtPskKey{p1}))
+			args = append(args, reflect.ValueOf(EvtPskKey{callbackData}))
 		case MosqEvtEXTAuthStart, MosqEvtEXTAuthContinue:
-			args = append(args, reflect.ValueOf(EvtExtendedAuth{p1}))
+			args = append(args, reflect.ValueOf(EvtExtendedAuth{callbackData}))
 		case MosqEvtControl:
-			args = append(args, reflect.ValueOf(EvtControl{p1}))
+			args = append(args, reflect.ValueOf(EvtControl{callbackData}))
 		case MosqEvtMessage:
-			args = append(args, reflect.ValueOf(EvtMessage{p1}))
+			args = append(args, reflect.ValueOf(EvtMessage{callbackData}))
 		case MosqEvtTick:
-			args = append(args, reflect.ValueOf(EvtTick{p1}))
+			args = append(args, reflect.ValueOf(EvtTick{callbackData}))
 		case MosqEvtDisconnect:
-			args = append(args, reflect.ValueOf(EvtDisconnect{p1}))
+			args = append(args, reflect.ValueOf(EvtDisconnect{callbackData}))
 		default:
 			return C.int(MosqErrUnknown)
 		}
@@ -188,9 +188,9 @@ func TopicMatchesSub(topic, subscription string) bool {
 //	MosqErrAlreadyExists - if cb_func has already been registered for this event
 //	MosqErrNotSupported - if the event is not supported
 func CallbackRegister(event Event, cb, eventData any) error {
-	tmp := registerX
+	regNo := registerX
 	registerX++
-	register[tmp] = cb
+	register[regNo] = cb
 	var ptr unsafe.Pointer
 	doFree := false
 	switch tmp := eventData.(type) {
@@ -203,7 +203,7 @@ func CallbackRegister(event Event, cb, eventData any) error {
 	default:
 		panic("Register: couldn't pass eventdata, bad type")
 	}
-	x := C.mosquitto_callback_register2(pluginId, C.int(event), C.go_mosquitto_generic_callback, ptr, C.uintptr_t(tmp))
+	x := C.mosquitto_callback_register2(pluginID, C.int(event), C.go_mosquitto_generic_callback, ptr, C.uintptr_t(regNo))
 	if doFree {
 		C.free(ptr)
 	}
@@ -252,7 +252,7 @@ func CallbackUnregister(event Event, cb, eventData any) error {
 	default:
 		panic("Unregister: couldn't pass eventData, bad type")
 	}
-	x := C.mosquitto_callback_unregister2(pluginId, C.int(event), C.go_mosquitto_generic_callback, ptr)
+	x := C.mosquitto_callback_unregister2(pluginID, C.int(event), C.go_mosquitto_generic_callback, ptr)
 	if doFree {
 		C.free(ptr)
 	}

@@ -46,8 +46,6 @@ type (
 	ptrStruct[T any] struct {
 		ptr unsafe.Pointer
 	}
-	EvtPskKey       ptrStruct[C.struct_mosquitto_evt_psk_key]
-	EvtExtendedAuth ptrStruct[C.struct_mosquitto_evt_extended_auth]
 )
 
 func (p ptrStruct[T]) getStruct() *T {

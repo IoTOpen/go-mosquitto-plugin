@@ -3,11 +3,16 @@ package mosquitto
 /*
 #include <malloc.h>
 #include <mosquitto_broker.h>
+
+char* x509_to_pem(void *cert);
+char* x509_to_der(void *cert, int *der_length);
 */
 import "C"
 import (
+	"crypto/x509"
 	"errors"
 	"fmt"
+	"log"
 	"unsafe"
 )
 
@@ -93,4 +98,22 @@ func (c Client) SetClientID(clientID string) error {
 		return fmt.Errorf("unable to set username: %d", int(res))
 	}
 	return nil
+}
+
+func (c Client) X509() *x509.Certificate {
+	x := c.asStruct()
+	var size C.int
+	certPointer := C.mosquitto_client_certificate(x)
+	log.Println("Pointer:", certPointer)
+	derPointer := C.x509_to_der(certPointer, &size)
+	if derPointer == nil {
+		return nil
+	}
+	defer C.free(unsafe.Pointer(derPointer))
+	derData := unsafe.Slice((*byte)(unsafe.Pointer(derPointer)), int(size))
+	cert, err := x509.ParseCertificate(derData)
+	if err != nil {
+		return nil
+	}
+	return cert
 }

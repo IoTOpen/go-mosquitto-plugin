@@ -6,7 +6,6 @@ import (
 
 // Plugin structure
 type Plugin struct {
-	id mosquitto.PluginID
 }
 
 // Version callback
@@ -15,8 +14,7 @@ func (p *Plugin) Version(versions []int) int {
 }
 
 // Init callback
-func (p *Plugin) Init(id mosquitto.PluginID, options mosquitto.Options) error {
-	p.id = id
+func (p *Plugin) Init(options mosquitto.Options) error {
 	return mosquitto.MosqErrSuccess
 }
 

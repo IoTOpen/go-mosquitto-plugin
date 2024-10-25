@@ -25,3 +25,8 @@ func (e EvtDisconnect) Client() Client {
 	x := e.asStruct()
 	return Client{unsafe.Pointer(x.client)}
 }
+
+func (e EvtDisconnect) Reason() ReasonCode {
+	x := e.asStruct()
+	return ReasonCode(x.reason)
+}
