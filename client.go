@@ -12,7 +12,6 @@ import (
 	"crypto/x509"
 	"errors"
 	"fmt"
-	"log"
 	"unsafe"
 )
 
@@ -104,7 +103,7 @@ func (c Client) X509() *x509.Certificate {
 	x := c.asStruct()
 	var size C.int
 	certPointer := C.mosquitto_client_certificate(x)
-	log.Println("Pointer:", certPointer)
+	defer C.X509_free(certPointer)
 	derPointer := C.x509_to_der(certPointer, &size)
 	if derPointer == nil {
 		return nil
