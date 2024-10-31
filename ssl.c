@@ -67,3 +67,10 @@ char* x509_to_der(X509 *cert, int *der_length) {
     *der_length = len;  // Set the length of DER data
     return der_data;    // Return DER-encoded data
 }
+
+
+char* convert_x509(X509 *cert, int *der_length) {
+	char* tmp = x509_to_der(cert, der_length);
+	X509_free(cert);
+	return tmp;
+}

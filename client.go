@@ -6,6 +6,7 @@ package mosquitto
 
 char* x509_to_pem(void *cert);
 char* x509_to_der(void *cert, int *der_length);
+char* convert_x509(void* cert, int *der_length);
 */
 import "C"
 import (
@@ -103,8 +104,7 @@ func (c Client) X509() *x509.Certificate {
 	x := c.asStruct()
 	var size C.int
 	certPointer := C.mosquitto_client_certificate(x)
-	defer C.X509_free(certPointer)
-	derPointer := C.x509_to_der(certPointer, &size)
+	derPointer := C.convert_x509(certPointer, &size)
 	if derPointer == nil {
 		return nil
 	}
