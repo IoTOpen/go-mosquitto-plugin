@@ -17,6 +17,8 @@ func (e Error) Error() string {
 
 // Errors from mosquitto.h
 const (
+	MosqErrQuotaExceeded        = Error(C.MOSQ_ERR_QUOTA_EXCEEDED)
+	MosqErrAuthDelayed          = Error(C.MOSQ_ERR_AUTH_DELAYED)
 	MosqErrAuthContinue         = Error(C.MOSQ_ERR_AUTH_CONTINUE)
 	MosqErrNoSubscribers        = Error(C.MOSQ_ERR_NO_SUBSCRIBERS)
 	MosqErrSubExists            = Error(C.MOSQ_ERR_SUB_EXISTS)
@@ -53,6 +55,8 @@ const (
 	MosqErrTopicAliasInvalid    = Error(C.MOSQ_ERR_TOPIC_ALIAS_INVALID)
 	MosqErrAdministrativeAction = Error(C.MOSQ_ERR_ADMINISTRATIVE_ACTION)
 	MosqErrAlreadyExists        = Error(C.MOSQ_ERR_ALREADY_EXISTS)
+	MosqErrPluginIgnore         = Error(C.MOSQ_ERR_PLUGIN_IGNORE)
+	MosqErrHTTPBadOrigin        = Error(C.MOSQ_ERR_HTTP_BAD_ORIGIN)
 )
 
 var errorMap = map[Error]string{

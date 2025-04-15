@@ -6,6 +6,7 @@ package mosquitto
 import "C"
 import "unsafe"
 
+// EvtExtendedAuth Extended auth event
 type (
 	EvtExtendedAuth ptrStruct[C.struct_mosquitto_evt_extended_auth]
 )

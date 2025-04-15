@@ -108,12 +108,20 @@ func goGenericCallback(event int, callbackData unsafe.Pointer, regNo uintptr) C.
 			args = append(args, reflect.ValueOf(EvtExtendedAuth{callbackData}))
 		case MosqEvtControl:
 			args = append(args, reflect.ValueOf(EvtControl{callbackData}))
-		case MosqEvtMessage:
+		case MosqEvtMessageIn, MosqEvtMessageOut:
 			args = append(args, reflect.ValueOf(EvtMessage{callbackData}))
 		case MosqEvtTick:
 			args = append(args, reflect.ValueOf(EvtTick{callbackData}))
 		case MosqEvtDisconnect:
 			args = append(args, reflect.ValueOf(EvtDisconnect{callbackData}))
+		case MosqEvtConnect:
+			args = append(args, reflect.ValueOf(EvtConnect{callbackData}))
+		case MosqEvtSubscribe:
+			args = append(args, reflect.ValueOf(EvtSubscribe{callbackData}))
+		case MosqEvtUnsubscribe:
+			args = append(args, reflect.ValueOf(EvtUnsubscribe{callbackData}))
+		case MosqEvtClientOffline:
+			args = append(args, reflect.ValueOf(EvtClientOffline{callbackData}))
 		default:
 			return C.int(MosqErrUnknown)
 		}
@@ -316,7 +324,6 @@ func KickClientByUsername(username string, withWill bool) int {
 	return int(res)
 }
 
-// Publish
 // Publish a message from within a plugin.
 //
 // This function allows a plugin to publish a message. Messages published in
@@ -372,4 +379,57 @@ func Publish(clientID, topic string, payload []byte, qos int, retain bool) error
 		C.free(payloadPtr)
 	}
 	return Error(x)
+}
+
+// GetClient returns a Client object for the given clientID.
+// Retrieve the mosquitto client for a client id.
+// If the client is not connected, ok will be false and the client is unusable.
+func GetClient(clientID string) (client Client, ok bool) {
+	var cid *C.char
+	if clientID != "" {
+		cid = C.CString(clientID)
+	}
+	x := C.mosquitto_client(cid)
+	C.free(unsafe.Pointer(cid))
+	if x == nil {
+		return Client{}, false
+	}
+	return Client{unsafe.Pointer(x)}, true
+}
+
+// CompleteBasicAuth Complete a delayed authentication request.
+// Useful for plugins that subscribe to the MosqEvtBasicAuth event. If your
+// plugin makes authentication requests that are not "instant", in particular
+// if they communicate with an external service, then instead of blocking for a
+// reply and returning MosqErrSuccess or MosqErrAuth, the plugin can return
+// MosqErrAuthDelayed. This means that the plugin is promising to tell the
+// broker the authentication result in the future. Once the plugin has an
+// answer, it should call CompleteBasicAuth passing the client
+// id and the result.
+//
+// Result:
+//
+// MosqErrSuccess - the client successfully authenticated
+// MosqErrAuth - the client authentication failed
+//
+// Other error codes can be used if more appropriate, and the client connection
+// will still be rejected, e.g. MosqErrNoMem.
+//
+// The plugin may use extra threads to handle the authentication requests, but
+// the call to CompleteBasicAuth must happen in the main
+// mosquitto thread. Using the MosqEvtTick event for this is suggested.
+func CompleteBasicAuth(clientID string, result error) {
+	var cid *C.char
+	if clientID != "" {
+		cid = C.CString(clientID)
+	}
+	var err Error
+	if result == nil {
+		err = MosqErrSuccess
+	}
+	if !errors.As(result, &err) {
+		err = MosqErrAuth
+	}
+	C.mosquitto_complete_basic_auth(cid, C.int(err))
+	C.free(unsafe.Pointer(cid))
 }

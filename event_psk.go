@@ -6,6 +6,7 @@ package mosquitto
 import "C"
 import "unsafe"
 
+// EvtPskKey Pre Shared Key event.
 type (
 	EvtPskKey ptrStruct[C.struct_mosquitto_evt_psk_key]
 )

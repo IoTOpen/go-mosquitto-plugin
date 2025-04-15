@@ -2,10 +2,11 @@ package main
 
 import (
 	"fmt"
-	"github.com/iotopen/go-mosquitto-plugin"
 	"log"
 	"log/slog"
 	"time"
+
+	"github.com/iotopen/go-mosquitto-plugin"
 )
 
 type Plugin struct{}
@@ -21,7 +22,7 @@ func (p *Plugin) Init(options mosquitto.Options) error {
 		log.Println("Error:", err)
 		return mosquitto.MosqErrUnknown
 	}
-	if err := mosquitto.CallbackRegister(mosquitto.MosqEvtMessage, onMessage, nil); err != nil {
+	if err := mosquitto.CallbackRegister(mosquitto.MosqEvtMessageIn, onMessage, nil); err != nil {
 		log.Println("Error:", err)
 		return mosquitto.MosqErrUnknown
 	}

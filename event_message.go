@@ -12,7 +12,7 @@ type (
 )
 
 func (e EvtMessage) String() string {
-	return MosqEvtMessage.String()
+	return MosqEvtMessageIn.String()
 }
 
 func (e EvtMessage) asStruct() *C.struct_mosquitto_evt_message {

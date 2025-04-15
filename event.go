@@ -17,10 +17,15 @@ const (
 	MosqEvtEXTAuthStart    = Event(C.MOSQ_EVT_EXT_AUTH_START)
 	MosqEvtEXTAuthContinue = Event(C.MOSQ_EVT_EXT_AUTH_CONTINUE)
 	MosqEvtControl         = Event(C.MOSQ_EVT_CONTROL)
-	MosqEvtMessage         = Event(C.MOSQ_EVT_MESSAGE)
+	MosqEvtMessageIn       = Event(C.MOSQ_EVT_MESSAGE_IN)
 	MosqEvtPSKKey          = Event(C.MOSQ_EVT_PSK_KEY)
 	MosqEvtTick            = Event(C.MOSQ_EVT_TICK)
 	MosqEvtDisconnect      = Event(C.MOSQ_EVT_DISCONNECT)
+	MosqEvtConnect         = Event(C.MOSQ_EVT_CONNECT)
+	MosqEvtSubscribe       = Event(C.MOSQ_EVT_SUBSCRIBE)
+	MosqEvtUnsubscribe     = Event(C.MOSQ_EVT_UNSUBSCRIBE)
+	MosqEvtMessageOut      = Event(C.MOSQ_EVT_MESSAGE_OUT)
+	MosqEvtClientOffline   = Event(C.MOSQ_EVT_CLIENT_OFFLINE)
 )
 
 func (e Event) String() string {
@@ -35,9 +40,14 @@ var eventMap = map[Event]string{
 	MosqEvtPSKKey:          "PSKKey",
 	MosqEvtReload:          "Reload",
 	MosqEvtTick:            "Tick",
-	MosqEvtMessage:         "Message",
+	MosqEvtMessageIn:       "MessageIn",
 	MosqEvtDisconnect:      "Disconnect",
 	MosqEvtBasicAuth:       "BasicAuth",
+	MosqEvtConnect:         "Connect",
+	MosqEvtSubscribe:       "Subscribe",
+	MosqEvtUnsubscribe:     "Unsubscribe",
+	MosqEvtMessageOut:      "MessageOut",
+	MosqEvtClientOffline:   "ClientOffline",
 }
 
 type (

@@ -5,7 +5,7 @@ package mosquitto
 */
 import "C"
 
-// EvtReload Reload event
+// EvtReload Reload event.
 type (
 	EvtReload ptrStruct[C.struct_mosquitto_evt_reload]
 )

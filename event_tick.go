@@ -7,7 +7,7 @@ import "C"
 
 import "time"
 
-// EvtTick Tick event
+// EvtTick Tick event.
 type (
 	EvtTick ptrStruct[C.struct_mosquitto_evt_tick]
 )

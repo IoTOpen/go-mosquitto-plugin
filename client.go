@@ -30,6 +30,12 @@ func (c Client) Address() string {
 	return C.GoString(res)
 }
 
+func (c Client) Port() int {
+	x := c.asStruct()
+	res := C.mosquitto_client_port(x)
+	return int(res)
+}
+
 func (c Client) CleanSession() bool {
 	x := c.asStruct()
 	res := C.mosquitto_client_clean_session(x)
