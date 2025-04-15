@@ -2,7 +2,7 @@ package mosquitto
 
 /*
 #include <malloc.h>
-#include <mosquitto_broker.h>
+#include <mosquitto.h>
 
 char* x509_to_pem(void *cert);
 char* x509_to_der(void *cert, int *der_length);

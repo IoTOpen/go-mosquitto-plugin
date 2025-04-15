@@ -4,8 +4,6 @@ package mosquitto
 /*
 #include <malloc.h>
 #include <mosquitto.h>
-#include <mosquitto_broker.h>
-#include <mosquitto_plugin.h>
 
 int go_mosquitto_generic_callback(int event, void* p1, void* p2);
 bool go_mosquitto_topic_matches_sub(char* topic, char* subscription);

@@ -3,7 +3,6 @@ package mosquitto
 /*
 #include <malloc.h>
 #include <mosquitto.h>
-#include <mosquitto_broker.h>
 
 void go_mosquitto_log_printf(int level, const char* fmt, const char* string);
 */

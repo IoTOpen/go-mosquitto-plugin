@@ -1,6 +1,4 @@
 #include <mosquitto.h>
-#include <mosquitto_broker.h>
-#include <mosquitto_plugin.h>
 
 int goMosquittoPluginVersion(int, int*);
 int goMosquittoPluginInit(mosquitto_plugin_id_t*, struct mosquitto_opt*, int);
