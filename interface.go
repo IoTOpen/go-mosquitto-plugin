@@ -8,6 +8,7 @@ package mosquitto
 
 int go_mosquitto_generic_callback(int event, void* p1, void* p2);
 bool go_mosquitto_topic_matches_sub(char* topic, char* subscription);
+bool go_mosquitto_sub_matches_acl(char* acl, char* sub);
 int mosquitto_callback_register2(mosquitto_plugin_id_t *id, int event, void* cb, void* eventData, uintptr_t userdata);
 int mosquitto_callback_unregister2(mosquitto_plugin_id_t *id, int event, void* cb, void* eventData);
 */
@@ -165,6 +166,15 @@ func TopicMatchesSub(topic, subscription string) bool {
 	res := C.go_mosquitto_topic_matches_sub(top, sub)
 	C.free(unsafe.Pointer(top))
 	C.free(unsafe.Pointer(sub))
+	return bool(res)
+}
+
+func SubMatchesACL(sub, acl string) bool {
+	subPtr := C.CString(sub)
+	aclPtr := C.CString(acl)
+	res := C.go_mosquitto_sub_matches_acl(subPtr, aclPtr)
+	C.free(unsafe.Pointer(subPtr))
+	C.free(unsafe.Pointer(aclPtr))
 	return bool(res)
 }
 

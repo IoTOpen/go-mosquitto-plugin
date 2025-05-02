@@ -32,6 +32,12 @@ bool go_mosquitto_topic_matches_sub(char* topic, char* subscription) {
     return res;
 }
 
+bool go_mosquitto_sub_matches_acl(char* acl, char* sub) {
+    bool res = false;
+    mosquitto_sub_matches_acl(acl, sub, &res);
+    return res;
+}
+
 int mosquitto_callback_register2(uintptr_t id, int event, void* cb, void* eventData, uintptr_t userData) {
     return mosquitto_callback_register((mosquitto_plugin_id_t*)id, event, cb, (void*)eventData, (void*)userData);
 }
