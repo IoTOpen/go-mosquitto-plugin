@@ -20,6 +20,36 @@ type Client struct {
 	ptr unsafe.Pointer
 }
 
+type Message struct {
+	ptr unsafe.Pointer
+}
+
+func (m Message) asStruct() *C.struct_mosquitto_message_v5 {
+	return (*C.struct_mosquitto_message_v5)(m.ptr)
+}
+
+func (m Message) Topic() string {
+	x := m.asStruct()
+	return C.GoString(x.topic)
+}
+
+func (m Message) Payload() []byte {
+	x := m.asStruct()
+	return unsafe.Slice((*byte)(x.payload), x.payloadlen)
+}
+
+func (m Message) QoS() int {
+	x := m.asStruct()
+	return int(x.qos) & 0xFF
+}
+
+func (m Message) Retained() bool {
+	x := m.asStruct()
+	return bool(x.retain)
+}
+
+
+
 func (c Client) asStruct() *C.struct_mosquitto {
 	return (*C.struct_mosquitto)(c.ptr)
 }
@@ -28,6 +58,15 @@ func (c Client) Address() string {
 	x := c.asStruct()
 	res := C.mosquitto_client_address(x)
 	return C.GoString(res)
+}
+
+func (c Client) Will() Message {
+	x := c.asStruct()
+	res := x.will
+	if res == nil {
+		return Message{}
+	}
+	return Message{res}
 }
 
 func (c Client) Port() int {
