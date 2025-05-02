@@ -35,6 +35,12 @@ func (p *Plugin) Init(options mosquitto.Options) error {
 	if err := mosquitto.RegisterTick(p.tick); err != nil {
 		return err
 	}
+	if err := mosquitto.RegisterControl(p.control, "$CONTROL/hello-world"); err != nil {
+		return err
+	}
+	if err := mosquitto.RegisterControl(p.control2, "$CONTROL/hello-world2"); err != nil {
+		return err
+	}
 	return mosquitto.MosqErrSuccess
 }
 
@@ -45,6 +51,16 @@ func (p *Plugin) tick(ev mosquitto.EvtTick) error {
 		mosquitto.CompleteBasicAuth(clientID, mosquitto.MosqErrSuccess)
 	default:
 	}
+	return nil
+}
+
+func (p *Plugin) control(ev mosquitto.EvtControl) error {
+	log.Println("I: Control on ", ev.Topic(), " with payload:", string(ev.Payload()))
+	return nil
+}
+
+func (p *Plugin) control2(ev mosquitto.EvtControl) error {
+	log.Println("I: Control on ", ev.Topic(), " with payload:", string(ev.Payload()))
 	return nil
 }
 
@@ -65,6 +81,7 @@ func (p *Plugin) onConnect(ev mosquitto.EvtConnect) error {
 
 func (p *Plugin) auth(ev mosquitto.EvtBasicAuth) error {
 	log.Println("I: Authentication Begin:", ev.Client().ClientID())
+	
 	go func(cid string) {
 		time.Sleep(5 * time.Second)
 		p.authChannel <- cid
