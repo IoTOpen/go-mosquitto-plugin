@@ -1,6 +1,7 @@
 package mosquitto
 
 //#cgo LDFLAGS: -Wl,-unresolved-symbols=ignore-all
+//#cgo CFLAGS: -I /usr/include -fPIC
 /*
 #include <malloc.h>
 #include <mosquitto.h>
