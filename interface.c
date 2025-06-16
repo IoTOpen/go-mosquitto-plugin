@@ -34,7 +34,7 @@ bool go_mosquitto_topic_matches_sub(char* topic, char* subscription) {
 
 bool go_mosquitto_sub_matches_acl(char* acl, char* sub) {
     bool res = false;
-    mosquitto_sub_matches_acl(acl, sub, &res);
+    mosquitto_sub_matches_acl(sub, acl, &res);
     return res;
 }
 
